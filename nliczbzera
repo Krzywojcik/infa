@@ -1,0 +1,31 @@
+#include <iostream>
+using namespace std;
+
+int main() {
+	int n; int i; int liczba; int suma; int srednia;
+
+	cout << "Podaj ile liczb zamierzasz wpisac" << endl;
+
+	cin >> n; 
+
+	suma = 0;
+
+		for (i = 0; i < n; i++) {
+
+			cout << "Podaj liczbe" << endl;
+			cin >> liczba;
+
+			suma = suma + liczba;
+		}
+
+		srednia = suma / n;
+
+		cout << "srednia wynosi " << srednia  << endl;
+
+		for (i = 0; i < srednia; i++) {
+			cout << "0";
+
+		}
+
+	return 0;
+}
