@@ -4,33 +4,22 @@
 #include < windows.h >
 using namespace std;
 
-int n;
-int m;
 
-
-int main() {
-
+void totolotek() {
+	int i;
 	cout << "Witamy w losowaniu Totolotek! Nastepuje zwolnienie blokady" << endl;
 	srand(time(NULL));
-	n = (rand() % 49 + 1);
-	cout << "1. liczba to: " << n << endl;
-	Sleep(5000);
-	n = (rand() % 49 + 1);
-	cout << "2. liczba to: " << n << endl;
-	Sleep(5000);
-	n = (rand() % 49 + 1);
-	cout << "3. liczba to: " << n << endl;
-	Sleep(5000);
-	n = (rand() % 49 + 1);
-	cout << "4. liczba to: " << n << endl;
-	Sleep(5000);
-	n = (rand() % 49 + 1);
-	cout << "5. liczba to: " << n << endl;
-	Sleep(5000);
-	n = (rand() % 49 + 1);
-	cout << "6. liczba to: " << n << endl;
+	for (i = 1; i <= 5; i++) {
+		cout << i << " liczba to: " << rand() % 49 + 1 << endl;
+		Sleep(1000);
+	}
 	cout << "Zyczymy najwiekszych wygranych!" << endl;
 
+}
+
+int main() {
+	
+	totolotek();
 
 	return 0;
 }
