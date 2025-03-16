@@ -1,0 +1,151 @@
+#include <iostream>
+using namespace std;
+
+class DoublyLinkedList {
+private:
+    static const int MAX_SIZE = 100;
+    int data[MAX_SIZE];  // Tablica przechowująca wartości
+    int next[MAX_SIZE];  // Indeksy następnych elementów
+    int prev[MAX_SIZE];  // Indeksy poprzednich elementów
+    int head;  // Indeks pierwszego elementu
+    int tail;  // Indeks ostatniego elementu
+    int freeIndex; // Indeks pierwszego wolnego miejsca
+
+public:
+    DoublyLinkedList() {
+        head = -1;
+        tail = -1;
+        freeIndex = 0;
+
+        // Inicjalizacja listy wolnych miejsc
+        for (int i = 0; i < MAX_SIZE - 1; i++) {
+            next[i] = i + 1;
+            prev[i] = -1; 
+        }
+        next[MAX_SIZE - 1] = -1;
+        prev[MAX_SIZE - 1] = -1;
+    }
+
+    void insert(int value, int position) {
+        if (freeIndex == -1) {
+            cout << "Lista jest pełna!" << endl;
+            return;
+        }
+
+        int newIndex = freeIndex;
+        freeIndex = next[freeIndex];
+
+        data[newIndex] = value;
+        next[newIndex] = -1;
+        prev[newIndex] = -1;
+
+        if (position == 0 || head == -1) {
+            next[newIndex] = head;
+            if (head != -1) prev[head] = newIndex;
+            head = newIndex;
+            if (tail == -1) tail = newIndex;
+        } else {
+            int temp = head;
+            for (int i = 0; i < position - 1 && next[temp] != -1; i++) {
+                temp = next[temp];
+            }
+
+            if (temp == -1) {
+                cout << "Pozycja poza zakresem!" << endl;
+                return;
+            }
+
+            next[newIndex] = next[temp];
+            prev[newIndex] = temp;
+
+            if (next[temp] != -1) prev[next[temp]] = newIndex;
+            next[temp] = newIndex;
+
+            if (tail == temp) tail = newIndex;
+        }
+    }
+
+    void remove(int position) {
+        if (head == -1) {
+            cout << "Lista jest pusta!" << endl;
+            return;
+        }
+
+        int toDelete;
+        if (position == 0) {
+            toDelete = head;
+            head = next[head];
+            if (head != -1) prev[head] = -1;
+            else tail = -1;
+        } else {
+            int temp = head;
+            for (int i = 0; i < position - 1 && next[temp] != -1; i++) {
+                temp = next[temp];
+            }
+
+            if (temp == -1 || next[temp] == -1) {
+                cout << "Pozycja poza zakresem!" << endl;
+                return;
+            }
+
+            toDelete = next[temp];
+            next[temp] = next[toDelete];
+            if (next[toDelete] != -1) prev[next[toDelete]] = temp;
+            if (tail == toDelete) tail = temp;
+        }
+
+        next[toDelete] = freeIndex;
+        freeIndex = toDelete;
+    }
+
+    int locate(int value) {
+        int temp = head;
+        int pos = 0;
+        while (temp != -1) {
+            if (data[temp] == value) return pos;
+            temp = next[temp];
+            pos++;
+        }
+        return -1;
+    }
+
+    int retrieve(int position) {
+        int temp = head;
+        for (int i = 0; i < position && temp != -1; i++) {
+            temp = next[temp];
+        }
+
+        if (temp == -1) {
+            cout << "Pozycja poza zakresem!" << endl;
+            return -1;
+        }
+
+        return data[temp];
+    }
+
+    void printList() {
+        int temp = head;
+        while (temp != -1) {
+            cout << data[temp] << " <-> ";
+            temp = next[temp];
+        }
+        cout << "nullptr" << endl;
+    }
+};
+
+int main() {
+    DoublyLinkedList list;
+
+    list.insert(10, 0);
+    list.insert(20, 1);
+    list.insert(30, 2);
+    list.printList();
+
+    cout << "Pozycja 20: " << list.locate(20) << endl;
+    cout << "Element na pozycji 1: " << list.retrieve(1) << endl;
+    
+    list.remove(1);
+    list.printList();
+
+    return 0;
+}
