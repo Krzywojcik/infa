@@ -1,0 +1,138 @@
+#include <iostream>
+using namespace std;
+
+class LinkedList {
+private:
+    static const int MAX_SIZE = 100; // Maksymalny rozmiar listy
+    int data[MAX_SIZE];  // Tablica przechowująca wartości
+    int next[MAX_SIZE];  // Tablica przechowująca indeksy następnych elementów
+    int head;  // Indeks pierwszego elementu listy
+    int freeIndex; // Indeks pierwszego wolnego miejsca w tablicy
+
+public:
+    LinkedList() {
+        head = -1;  // Lista jest pusta
+        freeIndex = 0;  // Pierwszy wolny indeks
+
+        // Inicjalizacja listy wolnych miejsc
+        for (int i = 0; i < MAX_SIZE - 1; i++) {
+            next[i] = i + 1;
+        }
+        next[MAX_SIZE - 1] = -1; // Ostatni element nie ma następnego wolnego miejsca
+    }
+
+    void insert(int value, int position) {
+        if (freeIndex == -1) {
+            cout << "Lista jest pełna!" << endl;
+            return;
+        }
+
+        int newIndex = freeIndex;  // Pobieramy pierwszy wolny indeks
+        freeIndex = next[freeIndex];  // Aktualizujemy pierwszy wolny indeks
+
+        data[newIndex] = value; // Przypisujemy wartość
+
+        if (position == 0 || head == -1) {
+            // Wstawianie na początek listy
+            next[newIndex] = head;
+            head = newIndex;
+        } else {
+            // Wstawianie w środku lub na końcu
+            int temp = head;
+            for (int i = 0; i < position - 1 && next[temp] != -1; i++) {
+                temp = next[temp];
+            }
+
+            if (temp == -1) {
+                cout << "Pozycja poza zakresem!" << endl;
+                return;
+            }
+
+            next[newIndex] = next[temp];
+            next[temp] = newIndex;
+        }
+    }
+
+    void remove(int position) {
+        if (head == -1) {
+            cout << "Lista jest pusta!" << endl;
+            return;
+        }
+
+        int toDelete;
+        if (position == 0) {
+            // Usunięcie pierwszego elementu
+            toDelete = head;
+            head = next[head];
+        } else {
+            // Usunięcie elementu w środku lub na końcu
+            int temp = head;
+            for (int i = 0; i < position - 1 && next[temp] != -1; i++) {
+                temp = next[temp];
+            }
+
+            if (temp == -1 || next[temp] == -1) {
+                cout << "Pozycja poza zakresem!" << endl;
+                return;
+            }
+
+            toDelete = next[temp];
+            next[temp] = next[toDelete];
+        }
+
+        // Zwrócenie indeksu do listy wolnych miejsc
+        next[toDelete] = freeIndex;
+        freeIndex = toDelete;
+    }
+
+    int locate(int value) {
+        int temp = head;
+        int pos = 0;
+        while (temp != -1) {
+            if (data[temp] == value) return pos;
+            temp = next[temp];
+            pos++;
+        }
+        return -1;
+    }
+
+    int retrieve(int position) {
+        int temp = head;
+        for (int i = 0; i < position && temp != -1; i++) {
+            temp = next[temp];
+        }
+
+        if (temp == -1) {
+            cout << "Pozycja poza zakresem!" << endl;
+            return -1;
+        }
+
+        return data[temp];
+    }
+
+    void printList() {
+        int temp = head;
+        while (temp != -1) {
+            cout << data[temp] << " -> ";
+            temp = next[temp];
+        }
+        cout << "nullptr" << endl;
+    }
+};
+
+int main() {
+    LinkedList list;
+
+    list.insert(10, 0);
+    list.insert(20, 1);
+    list.insert(30, 2);
+    list.printList();
+
+    cout << "Pozycja 20: " << list.locate(20) << endl;
+    cout << "Element na pozycji 1: " << list.retrieve(1) << endl;
+    
+    list.remove(1);
+    list.printList();
+
+    return 0;
+}
