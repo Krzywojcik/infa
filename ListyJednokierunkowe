@@ -1,138 +1,154 @@
 #include <iostream>
+
 using namespace std;
 
-class Node {
-public:
+struct Node {
     int data;
     Node* next;
-
-    Node(int value) {
-        data = value;
-        next = nullptr;
-    }
 };
 
-class LinkedList {
-public:
+class ListaJednokierunkowa {
+private:
     Node* head;
 
-    LinkedList() {
-        head = nullptr;
-    }
+public:
+    ListaJednokierunkowa() : head(nullptr) {}
 
-    void insert(int x, int p) {
-        Node* newNode = new Node(x);
-        if (p == 0) {
+    // 1. INSERT(x, p, L) - Wstawienie elementu na pozycję p
+    void INSERT(int x, int p) {
+        Node* newNode = new Node{ x, nullptr };
+
+        if (p == 0 || head == nullptr) { // Wstawianie na początek listy
             newNode->next = head;
             head = newNode;
-            return;
         }
-
-        Node* temp = head;
-        for (int i = 0; temp != nullptr && i < p - 1; i++) {
-            temp = temp->next;
+        else {
+            Node* temp = head;
+            for (int i = 0; i < p - 1 && temp->next != nullptr; i++) {
+                temp = temp->next;
+            }
+            newNode->next = temp->next;
+            temp->next = newNode;
         }
-
-        if (temp == nullptr) return;
-
-        newNode->next = temp->next;
-        temp->next = newNode;
     }
 
-    int locate(int x) {
+    // 2. LOCATE(x, L) - Znajduje pozycję pierwszego wystąpienia x
+    int LOCATE(int x) {
         Node* temp = head;
-        int pos = 0;
+        int position = 0;
         while (temp != nullptr) {
-            if (temp->data == x) return pos;
+            if (temp->data == x) {
+                return position;
+            }
             temp = temp->next;
-            pos++;
+            position++;
         }
-        return -1;
+        return END(); // Zwraca END(L) jeśli nie znaleziono
     }
 
-    int retrieve(int p) {
+    // 3. RETRIEVE(p, L) - Pobiera element na pozycji p
+    int RETRIEVE(int p) {
         Node* temp = head;
-        for (int i = 0; temp != nullptr && i < p; i++) {
+        for (int i = 0; i < p && temp != nullptr; i++) {
             temp = temp->next;
         }
-        return temp != nullptr ? temp->data : -1;
+        return (temp != nullptr) ? temp->data : -1; // -1 oznacza niepoprawną pozycję
     }
 
-    void remove(int p) {
+    // 4. DELETE(p, L) - Usuwa element na pozycji p
+    void DELETE(int p) {
         if (head == nullptr) return;
-        if (p == 0) {
+
+        if (p == 0) { // Usunięcie pierwszego elementu
             Node* temp = head;
             head = head->next;
             delete temp;
-            return;
         }
-        Node* temp = head;
-        for (int i = 0; temp->next != nullptr && i < p - 1; i++) {
-            temp = temp->next;
+        else {
+            Node* temp = head;
+            for (int i = 0; i < p - 1 && temp->next != nullptr; i++) {
+                temp = temp->next;
+            }
+            if (temp->next != nullptr) {
+                Node* nodeToDelete = temp->next;
+                temp->next = nodeToDelete->next;
+                delete nodeToDelete;
+            }
         }
-        if (temp->next == nullptr) return;
-        Node* toDelete = temp->next;
-        temp->next = temp->next->next;
-        delete toDelete;
     }
 
-    int next(int p) {
-        Node* temp = head;
-        for (int i = 0; temp != nullptr && i < p; i++) {
-            temp = temp->next;
-        }
-        return (temp != nullptr && temp->next != nullptr) ? p + 1 : -1;
+    // 5. NEXT(p, L) - Zwraca pozycję następnego elementu
+    int NEXT(int p) {
+        return (RETRIEVE(p + 1) != -1) ? p + 1 : END();
     }
 
-    int previous(int p) {
-        return (p > 0) ? p - 1 : -1;
+    // 6. PREVIOUS(p, L) - Zwraca pozycję poprzedniego elementu
+    int PREVIOUS(int p) {
+        return (p > 0) ? p - 1 : END();
     }
 
-    void makeNull() {
-        Node* temp;
+    // 7. MAKENULL(L) - Usuwa wszystkie elementy
+    int MAKENULL() {
         while (head != nullptr) {
-            temp = head;
+            Node* temp = head;
             head = head->next;
             delete temp;
         }
+        return END();
     }
 
-    int first() {
-        return (head != nullptr) ? 0 : -1;
+    // 8. FIRST(L) - Zwraca pierwszą pozycję
+    int FIRST() {
+        return (head != nullptr) ? 0 : END();
     }
 
-    void printList() {
+    // 9. PRINTLIST(L) - Wyświetla zawartość listy
+    void PRINTLIST() {
         Node* temp = head;
         while (temp != nullptr) {
             cout << temp->data << " -> ";
             temp = temp->next;
         }
-        cout << "nullptr" << endl;
+        cout << "NULL" << endl;
     }
 
-    ~LinkedList() {
-        makeNull();
+    // END(L) - Zwraca pozycję elementu po ostatnim elemencie
+    int END() {
+        Node* temp = head;
+        int position = 0;
+        while (temp != nullptr) {
+            temp = temp->next;
+            position++;
+        }
+        return position;
     }
 };
 
 int main() {
-    LinkedList list;
-    list.insert(10, 0);
-    list.insert(20, 1);
-    list.insert(30, 2);
-    list.insert(40, 3);
-    list.insert(50, 4);
-    list.insert(6000, 5);
-    list.printList();
-    cout << "Pozycja 20: " << list.locate(20) << endl;
-    cout << "Element na pozycji 1: " << list.retrieve(1) << endl;
-    list.remove(4);
-    list.printList();
-    cout << list.retrieve(3) << endl;
-    cout << "Następny po 0: " << list.next(0) << endl;
-    cout << "Poprzedni po 1: " << list.previous(1) << endl;
-    list.makeNull();
-    list.printList();
+    ListaJednokierunkowa lista;
+
+    lista.INSERT(10, 0);
+    lista.INSERT(20, 1);
+    lista.INSERT(30, 2);
+    lista.INSERT(40, 3);
+
+    cout << "Lista po dodaniu elementów: ";
+    lista.PRINTLIST();
+
+    cout << "Pozycja elementu 20: " << lista.LOCATE(20) << endl;
+    cout << "Element na pozycji 2: " << lista.RETRIEVE(2) << endl;
+
+    lista.DELETE(1);
+    cout << "Lista po usunięciu elementu na pozycji 1: ";
+    lista.PRINTLIST();
+
+    cout << "Pierwsza pozycja: " << lista.FIRST() << endl;
+    cout << "Następna pozycja po 1: " << lista.NEXT(1) << endl;
+    cout << "Poprzednia pozycja przed 2: " << lista.PREVIOUS(2) << endl;
+
+    lista.MAKENULL();
+    cout << "Lista po usunięciu wszystkich elementów: ";
+    lista.PRINTLIST();
 
     return 0;
 }
