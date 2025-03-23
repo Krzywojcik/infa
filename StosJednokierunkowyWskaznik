@@ -1,0 +1,94 @@
+#include <iostream>
+
+using namespace std;
+
+struct Node {
+    int data;
+    Node* next;
+};
+
+class Stack {
+private:
+    Node* top; // Wskaźnik na szczyt stosu
+
+public:
+    Stack() : top(nullptr) {}
+
+    // 1. MAKENULL(S) – Usuwa wszystkie elementy stosu
+    void MAKENULL() {
+        while (top != nullptr) {
+            Node* temp = top;
+            top = top->next;
+            delete temp;
+        }
+    }
+
+    // 2. TOP(S) – Zwraca szczytowy element stosu
+    int TOP() {
+        if (top != nullptr) {
+            return top->data;
+        }
+        cout << "Stos jest pusty!" << endl;
+        return -1; // Wartość błędna
+    }
+
+    // 3. POP(S) – Usuwa szczytowy element stosu
+    void POP() {
+        if (top != nullptr) {
+            Node* temp = top;
+            top = top->next;
+            delete temp;
+        } else {
+            cerr << "Stos jest pusty, nie można usunąć elementu!" << endl;
+        }
+    }
+
+    // 4. PUSH(x, S) – Dodaje element x na szczyt stosu
+    void PUSH(int x) {
+        Node* newNode = new Node{x, top};
+        top = newNode;
+    }
+
+    // 5. EMPTY(S) – Sprawdza, czy stos jest pusty
+    bool EMPTY() {
+        return top == nullptr;
+    }
+
+    // Metoda pomocnicza do wyświetlania stosu
+    void PRINTSTACK() {
+        Node* temp = top;
+        while (temp != nullptr) {
+            cout << temp->data << " -> ";
+            temp = temp->next;
+        }
+        cout << "NULL" << endl;
+    }
+};
+
+int main() {
+    Stack stos;
+
+    stos.PUSH(10);
+    stos.PUSH(20);
+    stos.PUSH(30);
+    
+    
+
+    cout << "Stos po dodaniu elementów: ";
+    stos.PRINTSTACK();
+
+    cout << "Szczytowy element stosu: " << stos.TOP() << endl;
+
+    stos.POP();
+    cout << "Stos po usunięciu szczytowego elementu: ";
+    stos.PRINTSTACK();
+
+    cout << "Czy stos jest pusty? " << (stos.EMPTY() ? "Tak" : "Nie") << endl;
+
+    stos.MAKENULL();
+    cout << "Stos po usunięciu wszystkich elementów: ";
+    stos.PRINTSTACK();
+
+stos.TOP();
+    return 0;
+}
