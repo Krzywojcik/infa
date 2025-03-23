@@ -1,0 +1,101 @@
+#include <iostream>
+
+using namespace std;
+
+struct Node {
+    int data;
+    Node* next;
+};
+
+class Queue {
+private:
+    Node* front; // Wskaźnik na pierwszy element kolejki
+    Node* rear;  // Wskaźnik na ostatni element kolejki
+
+public:
+    Queue() : front(nullptr), rear(nullptr) {}
+
+    // 1. MAKENULL(Q) – Usuwa wszystkie elementy z kolejki
+    void MAKENULL() {
+        while (front != nullptr) {
+            Node* temp = front;
+            front = front->next;
+            delete temp;
+        }
+        rear = nullptr; // Po usunięciu wszystkich elementów rear też powinien być null
+    }
+
+    // 2. FRONT(Q) – Zwraca pierwszy element kolejki
+    int FRONT() {
+        if (front != nullptr) {
+            return front->data;
+        }
+        cerr << "Kolejka jest pusta!" << endl;
+        return -1; // Wartość błędna
+    }
+
+    // 3. ENQUEUE(x, Q) – Dodaje element x na koniec kolejki
+    void ENQUEUE(int x) {
+        Node* newNode = new Node{x, nullptr};
+        if (rear == nullptr) { // Jeśli kolejka jest pusta
+            front = rear = newNode;
+        } else {
+            rear->next = newNode;
+            rear = newNode;
+        }
+    }
+
+    // 4. DEQUEUE(Q) – Usuwa pierwszy element kolejki
+    void DEQUEUE() {
+        if (front != nullptr) {
+            Node* temp = front;
+            front = front->next;
+            delete temp;
+            if (front == nullptr) { // Jeśli kolejka stała się pusta, rear też powinien być null
+                rear = nullptr;
+            }
+        } else {
+            cerr << "Kolejka jest pusta, nie można usunąć elementu!" << endl;
+        }
+    }
+
+    // 5. EMPTY(Q) – Sprawdza, czy kolejka jest pusta
+    bool EMPTY() {
+        return front == nullptr;
+    }
+
+    // Metoda pomocnicza do wyświetlania kolejki
+    void PRINTQUEUE() {
+        Node* temp = front;
+        while (temp != nullptr) {
+            cout << temp->data << " -> ";
+            temp = temp->next;
+        }
+        cout << "NULL" << endl;
+    }
+};
+
+int main() {
+    Queue kolejka;
+
+    kolejka.ENQUEUE(10);
+    kolejka.ENQUEUE(20);
+    kolejka.ENQUEUE(30);
+
+    cout << "Kolejka po dodaniu elementów: ";
+    kolejka.PRINTQUEUE();
+
+    cout << "Pierwszy element kolejki: " << kolejka.FRONT() << endl;
+
+    kolejka.DEQUEUE();
+    cout << "Kolejka po usunięciu pierwszego elementu: ";
+    kolejka.PRINTQUEUE();
+
+    cout << "Czy kolejka jest pusta? " << (kolejka.EMPTY() ? "Tak" : "Nie") << endl;
+
+    kolejka.MAKENULL();
+    cout << "Kolejka po usunięciu wszystkich elementów: ";
+    kolejka.PRINTQUEUE();
+
+    return 0;
+}
