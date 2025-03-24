@@ -1,0 +1,111 @@
+#include <iostream>
+#include <string>
+
+using namespace std;
+
+struct Book {
+    string tytul;
+    int id;
+    string autor;
+    int ilosc;
+    Book* next;
+};
+
+class LibraryCatalog {
+private:
+    Book* head;
+
+public:
+    LibraryCatalog() : head(nullptr) {}
+
+    // Dodawanie nowej ksiazki do katalogu
+    void addBook(string tytul, int id, string autor, int ilosc) {
+        Book* newBook = new Book{ tytul, id, autor, ilosc, nullptr };
+        if (!head || head->ilosc < ilosc) {
+            newBook->next = head;
+            head = newBook;
+        }
+        else {
+            Book* temp = head;
+            while (temp->next && temp->next->ilosc >= ilosc) {
+                temp = temp->next;
+            }
+            newBook->next = temp->next;
+            temp->next = newBook;
+        }
+    }
+
+    // Wypożyczanie ksiazki
+    bool borrowBook(int id) {
+        Book* temp = head;
+        while (temp) {
+            if (temp->id == id && temp->ilosc > 0) {
+                temp->ilosc--;
+                return true;
+            }
+            temp = temp->next;
+        }
+        return false;
+    }
+
+    // Zwrot ksiazki
+    void returnBook(int id) {
+        Book* temp = head;
+        while (temp) {
+            if (temp->id == id) {
+                temp->ilosc++;
+                return;
+            }
+            temp = temp->next;
+        }
+    }
+
+    // Wyszukiwanie ksiazki po tytule lub autorze
+    void searchBook(string a) {
+        Book* temp = head;
+        bool found = false;
+        while (temp) {
+            if (temp->tytul.find(a) == string::npos || temp->autor.find(a) != string::npos) {
+                cout << "ID: " << temp->id << ", Tytul: " << temp->tytul << ", Autor: " << temp->autor << ", ilosc: " << temp->ilosc << endl;
+                found = true;
+            }
+            temp = temp->next;
+        }
+        if (!found) {
+            cout << "Nie znaleziono ksiazki." << endl;
+        }
+    }
+
+    // Wyświetlanie listy książek posortowanej według liczby dostępnych egzemplarzy
+    void printCatalog() {
+        Book* temp = head;
+        while (temp) {
+            cout << "ID: " << temp->id << ", Tytul: " << temp->tytul << ", Autor: " << temp->autor << ", ilosc: " << temp->ilosc << endl;
+            temp = temp->next;
+        }
+    }
+};
+
+int main() {
+    LibraryCatalog catalog;
+
+    catalog.addBook("Wiedźmin", 1, "Andrzej Sapkowski", 5);
+    catalog.addBook("Dziady", 2, "Adam Mickiewicz", 3);
+    catalog.addBook("Lalka", 3, "Bolesław Prus", 7);
+
+    cout << "Katalog biblioteczny:\n";
+    catalog.printCatalog();
+
+    cout << "\nWypożyczenie ksiazki ID 1" << endl;
+    catalog.borrowBook(1);
+    catalog.printCatalog();
+
+    cout << "\nZwrot ksiazki ID 1" << endl;
+    catalog.returnBook(1);
+    catalog.printCatalog();
+
+    cout << "\nWyszukiwanie 'Mickiewicz':" << endl;
+    catalog.searchBook("Mickiewicz");
+
+    return 0;
+}
