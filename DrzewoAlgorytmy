@@ -6,11 +6,13 @@ struct Node {
     int value;
     Node* left;
     Node* right;
+    Node* parent;
 
-    Node(int val) {
+    Node(int val, Node* p = nullptr) {
         value = val;
         left = nullptr;
         right = nullptr;
+        parent = p;
     }
 };
 
@@ -19,34 +21,30 @@ class BST {
 private:
     Node* root;
 
-    // Pomocnicza funkcja do dodawania węzła
-    Node* insert(Node* node, int value) {
+    Node* insert(Node* node, int value, Node* parent) {
         if (node == nullptr)
-            return new Node(value);
+            return new Node(value, parent);
 
         if (value <= node->value)
-            node->left = insert(node->left, value);
+            node->left = insert(node->left, value, node);
         else
-            node->right = insert(node->right, value);
+            node->right = insert(node->right, value, node);
 
         return node;
     }
 
-    // Pomocnicza funkcja do znajdowania najmniejszego węzła
     Node* findMin(Node* node) {
         while (node && node->left != nullptr)
             node = node->left;
         return node;
     }
 
-    // Pomocnicza funkcja do znajdowania największego węzła
     Node* findMax(Node* node) {
         while (node && node->right != nullptr)
             node = node->right;
         return node;
     }
 
-    // Pomocnicza funkcja do usuwania węzła
     Node* remove(Node* node, int value) {
         if (node == nullptr) return node;
 
@@ -57,18 +55,19 @@ private:
             node->right = remove(node->right, value);
         }
         else {
-            // Węzeł do usunięcia znaleziony
             if (node->left == nullptr) {
                 Node* temp = node->right;
+                if (temp) temp->parent = node->parent;
                 delete node;
                 return temp;
             }
             else if (node->right == nullptr) {
                 Node* temp = node->left;
+                if (temp) temp->parent = node->parent;
                 delete node;
                 return temp;
             }
-            // Węzeł z dwoma dziećmi
+
             Node* temp = findMin(node->right);
             node->value = temp->value;
             node->right = remove(node->right, temp->value);
@@ -77,12 +76,33 @@ private:
         return node;
     }
 
-    // Pomocnicza funkcja do wyświetlania (inorder traversal)
     void inorder(Node* node) {
-        if (node == nullptr) return;
+        if (!node) return;
         inorder(node->left);
         cout << node->value << " ";
         inorder(node->right);
+    }
+
+    void preorder(Node* node) {
+        if (!node) return;
+        cout << node->value << " ";
+        preorder(node->left);
+        preorder(node->right);
+    }
+
+    void postorder(Node* node) {
+        if (!node) return;
+        postorder(node->left);
+        postorder(node->right);
+        cout << node->value << " ";
+    }
+
+    Node* search(Node* node, int value) {
+        if (node == nullptr || node->value == value)
+            return node;
+        if (value < node->value)
+            return search(node->left, value);
+        return search(node->right, value);
     }
 
 public:
@@ -91,7 +111,7 @@ public:
     }
 
     void insert(int value) {
-        root = insert(root, value);
+        root = insert(root, value, nullptr);
     }
 
     void remove(int value) {
@@ -112,6 +132,52 @@ public:
         inorder(root);
         cout << endl;
     }
+
+    void printPreorder() {
+        preorder(root);
+        cout << endl;
+    }
+
+    void printPostorder() {
+        postorder(root);
+        cout << endl;
+    }
+
+    bool search(int value) {
+        return search(root, value) != nullptr;
+    }
+
+    int successor(int value) {
+        Node* node = search(root, value);
+        if (!node) return -1;
+
+        if (node->right) {
+            return findMin(node->right)->value;
+        }
+
+        Node* p = node->parent;
+        while (p && node == p->right) {
+            node = p;
+            p = p->parent;
+        }
+        return p ? p->value : -1;
+    }
+
+    int predecessor(int value) {
+        Node* node = search(root, value);
+        if (!node) return -1;
+
+        if (node->left) {
+            return findMax(node->left)->value;
+        }
+
+        Node* p = node->parent;
+        while (p && node == p->left) {
+            node = p;
+            p = p->parent;
+        }
+        return p ? p->value : -1;
+    }
 };
 
 int main() {
@@ -125,11 +191,18 @@ int main() {
     tree.insert(60);
     tree.insert(80);
 
-    cout << "Inorder traversal: ";
+    cout << "Inorder: ";
     tree.printInorder();
 
-    cout << "Min: " << tree.findMin() << endl;
-    cout << "Max: " << tree.findMax() << endl;
+    cout << "Preorder: ";
+    tree.printPreorder();
+
+    cout << "Postorder: ";
+    tree.printPostorder();
+
+    cout << "Search 40: " << (tree.search(40) ? "Found" : "Not Found") << endl;
+    cout << "Successor of 60: " << tree.successor(60) << endl;
+    cout << "Predecessor of 60: " << tree.predecessor(60) << endl;
 
     tree.remove(50);
     cout << "After removing 50: ";
