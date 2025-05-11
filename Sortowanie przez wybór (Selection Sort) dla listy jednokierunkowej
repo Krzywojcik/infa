@@ -1,0 +1,73 @@
+#include <iostream>
+using namespace std;
+
+struct Node {
+    int value;
+    Node* next;
+};
+
+class SinglyLinkedList {
+private:
+    Node* head;
+
+public:
+    SinglyLinkedList() : head(nullptr) {}
+
+    void append(int value) {
+        Node* newNode = new Node{value, nullptr};
+        if (!head) {
+            head = newNode;
+            return;
+        }
+        Node* temp = head;
+        while (temp->next)
+            temp = temp->next;
+        temp->next = newNode;
+    }
+
+    void printList() {
+        Node* temp = head;
+        while (temp) {
+            cout << temp->value << " -> ";
+            temp = temp->next;
+        }
+        cout << "nullptr" << endl;
+    }
+
+    void selectionSort() {
+        Node* start = head;
+
+        while (start) {
+            Node* min_node = start;
+            Node* r = start->next;
+
+            while (r) {
+                if (r->value < min_node->value)
+                    min_node = r;
+                r = r->next;
+            }
+            swap(start->value, min_node->value);
+            start = start->next;
+        }
+    }
+};
+
+int main() {
+    SinglyLinkedList list;
+    list.append(5);
+    list.append(2);
+    list.append(9);
+    list.append(1);
+    list.append(5);
+    list.append(6);
+
+    cout << "Przed sortowaniem:" << endl;
+    list.printList();
+
+    list.selectionSort();
+
+    cout << "Po sortowaniu:" << endl;
+    list.printList();
+
+    return 0;
+}
