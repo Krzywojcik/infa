@@ -1,0 +1,83 @@
+#include <iostream>
+using namespace std;
+
+struct Node {
+    int value;
+    Node* next;
+};
+
+class SinglyLinkedList {
+private:
+    Node* head;
+
+public:
+    SinglyLinkedList() {
+        head = nullptr;
+    }
+
+    void append(int value) {
+        Node* newNode = new Node{value, nullptr};
+        if (!head) {
+            head = newNode;
+            return;
+        }
+        Node* temp = head;
+        while (temp->next)
+            temp = temp->next;
+        temp->next = newNode;
+    }
+
+    void printList() {
+        Node* temp = head;
+        while (temp) {
+            cout << temp->value << " -> ";
+            temp = temp->next;
+        }
+        cout << "nullptr" << endl;
+    }
+
+    void insertionSort() {
+        if (!head || !head->next) return;
+
+        Node* sorted = nullptr;
+
+        Node* current = head;
+        while (current) {
+            Node* next = current->next;
+
+            if (!sorted || current->value < sorted->value) {
+                current->next = sorted;
+                sorted = current;
+            } else {
+                Node* search = sorted;
+                while (search->next && search->next->value < current->value) {
+                    search = search->next;
+                }
+                current->next = search->next;
+                search->next = current;
+            }
+            current = next;
+        }
+        head = sorted;
+    }
+};
+
+int main() {
+    SinglyLinkedList list;
+    list.append(5);
+    list.append(2);
+    list.append(9);
+    list.append(1);
+    list.append(5);
+    list.append(6);
+
+    cout << "Przed sortowaniem:" << endl;
+    list.printList();
+
+    list.insertionSort();
+
+    cout << "Po sortowaniu:" << endl;
+    list.printList();
+
+    return 0;
+}
