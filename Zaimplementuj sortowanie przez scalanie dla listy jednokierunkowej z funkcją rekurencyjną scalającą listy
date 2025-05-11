@@ -10,6 +10,60 @@ class SinglyLinkedList {
 private:
     Node* head;
 
+    // Funkcja pomocnicza do dzielenia listy na pół
+    void split(Node* source, Node** frontRef, Node** backRef) {
+        Node* fast;
+        Node* slow;
+        slow = source;
+        fast = source->next;
+
+        while (fast) {
+            fast = fast->next;
+            if (fast) {
+                slow = slow->next;
+                fast = fast->next;
+            }
+        }
+
+        *frontRef = source;
+        *backRef = slow->next;
+        slow->next = nullptr;
+    }
+
+    // Funkcja scalająca dwie listy
+    Node* merge(Node* a, Node* b) {
+        if (!a) return b;
+        if (!b) return a;
+
+        Node* result = nullptr;
+
+        if (a->value <= b->value) {
+            result = a;
+            result->next = merge(a->next, b);
+        } else {
+            result = b;
+            result->next = merge(a, b->next);
+        }
+        return result;
+    }
+
+    // Główna funkcja rekurencyjna sortująca
+    void mergeSort(Node** headRef) {
+        Node* head = *headRef;
+        if (!head || !head->next)
+            return;
+
+        Node* a;
+        Node* b;
+
+        split(head, &a, &b);
+
+        mergeSort(&a);
+        mergeSort(&b);
+
+        *headRef = merge(a, b);
+    }
+
 public:
     SinglyLinkedList() : head(nullptr) {}
 
@@ -34,21 +88,8 @@ public:
         cout << "nullptr" << endl;
     }
 
-    void selectionSort() {
-        Node* start = head;
-
-        while (start) {
-            Node* min_node = start;
-            Node* r = start->next;
-
-            while (r) {
-                if (r->value < min_node->value)
-                    min_node = r;
-                r = r->next;
-            }
-            swap(start->value, min_node->value);
-            start = start->next;
-        }
+    void sort() {
+        mergeSort(&head);
     }
 };
 
@@ -61,10 +102,10 @@ int main() {
     list.append(5);
     list.append(6);
 
-    cout << "Przed sortowaniem:" << endl;
+    cout << "Przed sortowaniem (Merge Sort):" << endl;
     list.printList();
 
-    list.selectionSort();
+    list.sort();
 
     cout << "Po sortowaniu:" << endl;
     list.printList();
